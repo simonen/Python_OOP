@@ -17,3 +17,6 @@ class Coffee(HotBeverage):
     @caffeine.setter
     def caffeine(self, value):
         self.__caffeine = value
+
+    def __str__(self) -> str:
+        return f"name: {self.name}, price: {self.price}, milliliters: {self.milliliters}, caffeine: {self.caffeine}"

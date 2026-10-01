@@ -3,17 +3,23 @@ from project.equipment import Equipment
 from project.exercise_plan import ExercisePlan
 from project.subscription import Subscription
 from project.trainer import Trainer
-from typing import List
+from typing import TypeVar
+
+
+T = TypeVar("T", Customer, Subscription, Trainer, Equipment, ExercisePlan)
 
 
 class Gym:
-
     def __init__(self) -> None:
-        self.customers: List[Customer] = []
-        self.trainers: List[Trainer] = []
-        self.equipment: List[Equipment] = []
-        self.plans: List[ExercisePlan] = []
-        self.subscriptions: List[Subscription] = []
+        self.customers: list[Customer] = []
+        self.trainers: list [Trainer] = []
+        self.equipment: list[Equipment] = []
+        self.plans: list[ExercisePlan] = []
+        self.subscriptions: list[Subscription] = []
+
+    def _find_by_id(self, item_id: int, store: list[T]) -> T | None:
+        value = next((x for x in store if x.id == item_id), None)
+        return value
 
     def add_customer(self, customer: Customer) -> None:
         if customer not in self.customers:
@@ -36,10 +42,11 @@ class Gym:
             self.subscriptions.append(subscription)
 
     def subscription_info(self, subscription_id: int) -> str:
-        subscription = next(x for x in self.subscriptions if x.id == subscription_id)
-        customer = next(x for x in self.customers if x.id == subscription_id)
-        trainer = next(x for x in self.trainers if x.id == subscription_id)
-        equipment = next(x for x in self.equipment if x.id == subscription_id)
-        plan = next(x for x in self.plans if x.id == subscription_id)
+        sub = self._find_by_id(subscription_id, self.subscriptions)
+        plan = self._find_by_id(sub.exercise_id, self.plans)
+        customer = self._find_by_id(sub.customer_id, self.customers)
+        trainer = self._find_by_id(sub.trainer_id, self.trainers)
+        equipment = self._find_by_id(plan.equipment_id, self.equipment)
+        res = [sub, customer, trainer, equipment, plan]
 
-        return f"{subscription}\n{customer}\n{trainer}\n{equipment}\n{plan}"
+        return "\n".join(map(str, res))

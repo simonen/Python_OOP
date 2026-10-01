@@ -12,7 +12,10 @@ class Player:
         return self.__name
 
     @name.setter
-    def name(self, value):
+    def name(self, value: str):
+        if str(value) == '':
+            raise ValueError
+
         self.__name = value
 
     def __str__(self):

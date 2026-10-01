@@ -9,30 +9,29 @@ class Zoo:
         self.__budget = budget
         self.__animal_capacity = animal_capacity
         self.__workers_capacity = workers_capacity
-        self.animals = []
-        self.workers = []
+        self.animals: list[Animal] = []
+        self.workers: list[Worker] = []
 
     def add_animal(self, animal: Animal, price) -> str:
-        if self.__budget >= price and self.__animal_capacity > len(self.animals):
-            self.__budget -= price
-            self.animals.append(animal)
-            return f"{animal.name} the {animal.__class__.__name__} added to the zoo"
-
         if self.__budget < price:
             return "Not enough budget"
+        if len(self.animals) == self.__animal_capacity:
+            return "Not enough space for animal"
 
-        return "Not enough space for animal"
+        self.__budget -= price
+        self.animals.append(animal)
+        return f"{animal.name} the {animal.__class__.__name__} added to the zoo"
 
     def hire_worker(self, worker: Worker) -> str:
-        if self.__workers_capacity > len(self.workers):
-            self.workers.append(worker)
-            return f"{worker.name} the {worker.__class__.__name__} hired successfully"
+        if len(self.workers) == self.__workers_capacity:
+            return "Not enough space for worker"
 
-        return "Not enough space for worker"
+        self.workers.append(worker)
+        return f"{worker.name} the {worker.__class__.__name__} hired successfully"
 
     def fire_worker(self, worker_name) -> str:
         try:
-            worker = next(filter(lambda x: x.name == worker_name, self.workers))
+            worker = next(x for x in self.workers if x.name == worker_name)
         except StopIteration:
             return f"There is no {worker_name} in the zoo"
 
@@ -40,20 +39,20 @@ class Zoo:
         return f"{worker_name} fired successfully"
 
     def pay_workers(self) -> str:
-        salaries = sum([x.salary for x in self.workers])
-        if self.__budget >= salaries:
-            self.__budget -= salaries
-            return f"You payed your workers. They are happy. Budget left: {self.__budget}"
+        salary_total = sum([x.salary for x in self.workers])
+        if self.__budget < salary_total:
+            return f"You have no budget to pay your workers. They are unhappy"
 
-        return "You have no budget to pay your workers. They are unhappy"
+        self.__budget -= salary_total
+        return f"You payed your workers. They are happy. Budget left: {self.__budget}"
 
     def tend_animals(self) -> str:
-        expense = sum([x.money_for_care for x in self.animals])
-        if self.__budget >= expense:
-            self.__budget -= expense
-            return f"You tended all the animals. They are happy. Budget left: {self.__budget}"
+        tend_cost = sum([x.money_for_care for x in self.animals])
+        if self.__budget < tend_cost:
+            return "You have no budget to tend the animals. They are unhappy."
 
-        return "You have no budget to tend the animals. They are unhappy."
+        self.__budget -= tend_cost
+        return f"You tended all the animals. They are happy. Budget left: {self.__budget}"
 
     def profit(self, amount) -> None:
         self.__budget += amount

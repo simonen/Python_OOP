@@ -14,9 +14,7 @@ class Pizza:
         if len(self.toppings) == self.max_number_of_toppings:
             raise ValueError("Not enough space for another topping")
 
-        if topping.topping_type not in self.toppings:
-            self.toppings[topping.topping_type] = 0
-
+        self.toppings.setdefault(topping.topping_type, 0)
         self.toppings[topping.topping_type] += topping.weight
 
     def calculate_total_weight(self):

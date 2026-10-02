@@ -1,13 +1,10 @@
-from typing import List
-
-
 class Person:
 
     def __init__(self, name: str, surname: str) -> None:
         self.name = name
         self.surname = surname
 
-    def __add__(self, other):
+    def __add__(self, other: "Person") -> "Person":
         return Person(self.name, other.surname)
 
     def __repr__(self) -> str:
@@ -16,37 +13,37 @@ class Person:
 
 class Group:
 
-    def __init__(self, name: str, people: List[Person]) -> None:
+    def __init__(self, name: str, people: list[Person]) -> None:
         self.name = name
         self.people = people
-
-    def __add__(self, other):
-        extended_group = self.people + other.people
-        return Group(f"{self.name + ' ' + other.name}", extended_group)
 
     def __len__(self) -> int:
         return len(self.people)
 
+    def __add__(self, other: "Group | Person") -> "Group":
+        if isinstance(other, Person):  # Narrows other to Person.
+            return Group(self.name, self.people + [other])
+        return Group(f"{self.name} {other.name}", self.people  + other.people) # Ensures other is a Group
+
+    def __getitem__(self, index):     # Makes object subscriptable
+        # return self.people[index]     # Returns object. Better
+        return f"Person {index}: {self.people[index]}"
+
     def __iter__(self):
-        self.index = 0
-        return self
-
-    def __next__(self):
-        if self.index >= len(self.people):
-            raise StopIteration
-
-        person = self.people[self.index]
-        person_string = f"Person {self.index}: {person.name + ' ' + person.surname}"
-        self.index += 1
-
-        return person_string
-
-    def __getitem__(self, item):
-        return f"Person {item}: {self.people[item]}"
+        return iter(f"Person {i}: {p}" for i, p in enumerate(self.people))
 
     def __repr__(self) -> str:
-        return f"Group {self.name} with members {', '.join(map(str, self.people))}"
-
+        return f"Group {self.name} with members {', '.join(str(x) for x in self.people)}"
+    #
+    # def __next__(self):
+    #     if self.index >= len(self.people):
+    #         raise StopIteration
+    #
+    #     person = self.people[self.index]
+    #     person_string = f"Person {self.index}: {person.name + ' ' + person.surname}"
+    #     self.index += 1
+    #
+    #     return person_string
 
 p0 = Person('Aliko', 'Dangote')
 p1 = Person('Bill', 'Gates')

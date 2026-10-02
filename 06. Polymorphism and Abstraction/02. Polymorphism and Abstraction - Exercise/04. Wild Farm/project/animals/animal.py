@@ -3,49 +3,40 @@ from project.food import Food
 
 
 class Animal(ABC):
+    WEIGHT_INCREASE_BY: float
+    FOOD = []
 
-    def __init__(self, name: str, weight: float) -> None:
+    def __init__(self, name: str, weight: float, food_eaten = 0) -> None:
         self.name = name
         self.weight = weight
-        self.food_eaten = 0
-
-    @property
-    @abstractmethod
-    def foods(self):
-        pass
-
-    @property
-    @abstractmethod
-    def weight_gain(self):
-        pass
+        self.food_eaten = food_eaten
 
     @abstractmethod
     def make_sound(self):
-        pass
+        ...
 
-    def feed(self, food: Food) -> str or None:
-        if type(food) not in self.foods:
+    def feed(self, food: Food):
+        if type(food) not in self.FOOD:
             return f"{self.__class__.__name__} does not eat {food.__class__.__name__}!"
 
-        self.weight += food.quantity * self.weight_gain
         self.food_eaten += food.quantity
+        self.weight += (self.WEIGHT_INCREASE_BY * food.quantity)
+        return None
 
 
-class Bird(Animal, ABC):
-
-    def __init__(self, name, weight, wing_size: float):
-        super().__init__(name, weight)
-        self.wing_size = wing_size
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__} [{self.name}, {self.wing_size}, {self.weight}, {self.food_eaten}]"
-
-
-class Mammal(Animal, ABC):
-
-    def __init__(self, name: str, weight: float, living_region) -> None:
-        super().__init__(name, weight)
+class Mammal(Animal):
+    def __init__(self, name: str, weight: float, living_region: str, food_eaten=0) -> None:
+        super().__init__(name, weight, food_eaten)
         self.living_region = living_region
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__} [{self.name}, {self.weight}, {self.living_region}, {self.food_eaten}]"
+
+
+class Bird(Animal):
+    def __init__(self, name: str, weight: float, wing_size: float, food_eaten = 0, ) -> None:
+        super().__init__(name, weight, food_eaten)
+        self.wing_size = wing_size
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__} [{self.name}, {self.wing_size}, {self.weight}, {self.food_eaten}]"

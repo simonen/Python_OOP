@@ -1,63 +1,32 @@
-from abc import ABC, abstractmethod
-from project.animals.animal import Animal, Mammal
-from project.food import Food, Vegetable, Fruit, Meat, Seed
-
-
-mice_food = ['Vegetable', 'Fruit']
-cat_food = ['Vegetable', 'Meat']
+from project.animals.animal import Mammal
+from project.food import Vegetable
+from project.food import Fruit
+from project.food import Meat
 
 
 class Mouse(Mammal):
-    @staticmethod
-    def make_sound() -> str:
+    FOOD = [Vegetable, Fruit]
+    WEIGHT_INCREASE_BY = 0.10
+    def make_sound(self):
         return "Squeak"
-
-    @property
-    def foods(self) -> list:
-        return [Vegetable, Fruit]
-
-    @property
-    def weight_gain(self) -> float:
-        return 0.1
 
 
 class Dog(Mammal):
-    @staticmethod
-    def make_sound():
+    WEIGHT_INCREASE_BY = 0.40
+    FOOD = [Meat]
+    def make_sound(self):
         return "Woof!"
-
-    @property
-    def foods(self) -> list:
-        return [Meat]
-
-    @property
-    def weight_gain(self) -> float:
-        return 0.4
 
 
 class Cat(Mammal):
-    @staticmethod
-    def make_sound():
+    FOOD = [Vegetable, Meat]
+    WEIGHT_INCREASE_BY = 0.30
+    def make_sound(self):
         return "Meow"
-
-    @property
-    def foods(self) -> list:
-        return [Vegetable, Meat]
-
-    @property
-    def weight_gain(self) -> float:
-        return 0.30
 
 
 class Tiger(Mammal):
-    @staticmethod
-    def make_sound():
+    FOOD = [Meat]
+    WEIGHT_INCREASE_BY = 1.00
+    def make_sound(self):
         return "ROAR!!!"
-
-    @property
-    def foods(self) -> list:
-        return [Meat]
-
-    @property
-    def weight_gain(self) -> float:
-        return 1.00

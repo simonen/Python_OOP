@@ -1,31 +1,28 @@
+from abc import ABC, abstractmethod
 from typing import List
 
 
-class Animal:
-    def __init__(self, species) -> None:
-        self.species = species
+class Animal(ABC):
+    @abstractmethod
+    def make_sound(self) -> str:
+        ...
 
-    def get_species(self) -> str:
-        return self.species
-
+class Chicken(Animal):
     def make_sound(self):
-        pass
-
+        return 'Kur-kur'
 
 class Cat(Animal):
-
-    def make_sound(self) -> str:
+    def make_sound(self):
         return 'meow'
 
-
 class Dog(Animal):
-    def make_sound(self) -> str:
+    def make_sound(self):
         return 'woof-woof'
 
 
 def animal_sound(animals: List[Animal]) -> None:
     for animal in animals:
-        print(animal.make_sound())
+        animal.make_sound()
 
 
 cat = Cat('cat')

@@ -25,6 +25,9 @@ class Book(Printable):
     def __str__(self):
         return self.content
 
+class Image(Printable):
+    def get_content(self):
+        return self.content
 
 class Formatter(ABC):
     @abstractmethod
@@ -41,9 +44,15 @@ class BasicFormatter(Formatter):
         return Book(new_content)
 
 
+class Colorizer(Formatter):
+    def format(self, printable: Printable) -> Printable:
+        ...
+
+
 class FormatterFactory:
     _registry: dict[type[Printable], type[Formatter]] = {
-        Book: BasicFormatter
+        Book: BasicFormatter,
+        Image: Colorizer,
     }
 
     @classmethod
@@ -52,10 +61,6 @@ class FormatterFactory:
         if formatter_cls is None:
             raise ValueError(f"No formatter registered for ...")
         return formatter_cls()
-
-class Colorizer(Formatter):
-    def format(self, printable: Printable) -> Printable:
-        ...
 
 
 class Plotter(PrintingDevice):

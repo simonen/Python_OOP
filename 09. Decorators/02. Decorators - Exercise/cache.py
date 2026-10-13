@@ -2,6 +2,7 @@ def cache(func):
     cached = {}
     def wrapper(n):
         print(f"Calling {func.__name__}")
+        print(cached)
         if n not in cached:
             cached[n] = func(n)
         return cached[n]

@@ -1,46 +1,35 @@
-from abc import abstractmethod, ABC
-from typing import List
+from abc import ABC,abstractmethod
 from project.robots.female_robot import FemaleRobot
 from project.robots.male_robot import MaleRobot
+from project.robots.base_robot import BaseRobot
 
 
 class BaseService(ABC):
-
-    def __init__(self, name: str, capacity: int):
+    def __init__(self, name: str, capacity: int) -> None:
         self.name = name
         self.capacity = capacity
-        self.robots: List[FemaleRobot, MaleRobot] = []
+        self.robots: list[BaseRobot] = []
 
     @abstractmethod
     def details(self):
-        pass
+        ...
 
     @property
-    def capacity(self) -> None:
-        return self.__capacity
-
-    @capacity.setter
-    def capacity(self, value) -> None:
-        if value <= 0:
-            raise ValueError("Service capacity cannot be less than or equal to 0!")
-
-        self.__capacity = value
-
-    @property
-    def name(self) -> None:
-        return self.__name
+    def name(self):
+        return self._name
 
     @name.setter
-    def name(self, value):
-        if len(value.strip()) == 0:
+    def name(self, value: str):
+        if not value.split():
             raise ValueError("Service name cannot be empty!")
+        self._name = value
 
-        self.__name = value
+    @property
+    def capacity(self):
+        return self._capacity
 
-    def increase_cap(self):
-        self.__capacity += 1
-
-    def decrease_cap(self):
-        self.__capacity -= 1
-        if self.__capacity < 0:
-            self.__capacity = 0
+    @capacity.setter
+    def capacity(self, value: int):
+        if value <= 0:
+            raise ValueError("Service capacity cannot be less than or equal to 0!")
+        self._capacity = value

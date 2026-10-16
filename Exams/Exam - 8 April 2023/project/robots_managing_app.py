@@ -43,7 +43,7 @@ class RobotsManagingApp:
     def _get_robot(self, name: str, store: list[BaseRobot]) -> BaseRobot:
         robot = self._find_robot(name, store)
         if robot is None:
-            raise Exception("Robot not found")
+            raise Exception("No such robot in this service!")
         return robot
 
     def _get_service(self, name: str) -> BaseService:
@@ -79,10 +79,6 @@ class RobotsManagingApp:
 
     def feed_all_robots_from_service(self, service_name: str) -> str:
         service = self._get_service(service_name)
-
-        if len(service.robots) == 0:
-            raise Exception("No robots")
-
         for robot in service.robots:
             robot.eating()
 
@@ -91,9 +87,6 @@ class RobotsManagingApp:
     def service_price(self, service_name: str) -> str:
         service = self._get_service(service_name)
         total_robot_price = sum(x.price for x in service.robots)
-
-        if service is None:
-            raise Exception("Service does not exist!")
 
         return f"The value of service {service_name} is {total_robot_price:.2f}."
 

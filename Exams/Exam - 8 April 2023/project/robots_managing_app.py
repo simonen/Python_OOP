@@ -40,7 +40,7 @@ class RobotsManagingApp:
         service = next((x for x in self.services if x.name == name), None)
         return service
 
-    def _get_robot(self, name: str, store: list) -> BaseRobot:
+    def _get_robot(self, name: str, store: list[BaseRobot]) -> BaseRobot:
         robot = self._find_robot(name, store)
         if robot is None:
             raise Exception("Robot not found")

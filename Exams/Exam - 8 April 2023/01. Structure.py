@@ -1,11 +1,4 @@
-from project.robots.base_robot import BaseRobot
-from project.robots.female_robot import FemaleRobot
-from project.robots.male_robot import MaleRobot
 from project.robots_managing_app import RobotsManagingApp
-from project.services.base_service import BaseService
-from project.services.main_service import MainService
-from project.services.secondary_service import SecondaryService
-
 
 main_app = RobotsManagingApp()
 print(main_app.add_service('SecondaryService', 'ServiceRobotsWorld'))

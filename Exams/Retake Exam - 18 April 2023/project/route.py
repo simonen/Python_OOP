@@ -9,9 +9,8 @@ class Route:
 
     @staticmethod
     def is_valid(string):
-        if len(string.strip()) != 0:
+        if string.strip():
             return True
-
         return False
 
     @property

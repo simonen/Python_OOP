@@ -1,37 +1,35 @@
 from abc import ABC, abstractmethod
-from typing import List
 from project.decoration.base_decoration import BaseDecoration
 from project.fish.base_fish import BaseFish
 
 
 class BaseAquarium(ABC):
-
     def __init__(self, name: str, capacity: int):
         self.name = name
         self.capacity = capacity
-        self.decorations: List[BaseDecoration] = []
-        self.fish: List[BaseFish] = []
+        self.decorations: list[BaseDecoration] = []
+        self.fish: list[BaseFish] = []
 
     @property
     def name(self):
-        return self.__name
+        return self._name
 
     @name.setter
-    def name(self, value):
-        if len(value) == 0:
+    def name(self, value: str):
+        if not value.split():
             raise ValueError("Aquarium name cannot be an empty string.")
 
-        self.__name = value
+        self._name = value
 
     def calculate_comfort(self):
-        return sum([d.comfort for d in self.decorations])
+        return sum(x.comfort for x in self.decorations)
 
     def add_fish(self, fish: BaseFish) -> str:
-        if self.capacity >= len(self.fish) + 1:
-            self.fish.append(fish)
-            return f"Successfully added {fish.__class__.__name__} to {self.name}."
+        if len(self.fish) == self.capacity:
+            return "Not enough capacity."
 
-        return f"Not enough capacity."
+        self.fish.append(fish)
+        return f"Successfully added {fish.__class__.__name__} to {self.name}."
 
     def remove_fish(self, fish: BaseFish) -> None:
         if fish in self.fish:
@@ -40,12 +38,14 @@ class BaseAquarium(ABC):
     def add_decoration(self, decoration: BaseDecoration) -> None:
         self.decorations.append(decoration)
 
-    def feed(self) -> None:
+    def feed(self):
         for fish in self.fish:
             fish.eat()
 
-    def __str__(self) -> str:
-        return f"{self.name}:" \
-               f"\nFish: {' '.join([f.name for f in self.fish]) if self.fish else 'none'}" \
-               f"\nDecorations: {len(self.decorations)}" \
-               f"\nComfort: {self.calculate_comfort()}"
+    def __str__(self):
+        fish_list = [x.name for x in self.fish] if self.fish else ["none"]
+        res = ([f"{self.name}:",
+                f"Fish: {' '.join(fish_list)}"] +
+               [f"Decorations: {len(self.decorations)}"] +
+               [f"Comfort: {self.calculate_comfort()}"])
+        return "\n".join(res)

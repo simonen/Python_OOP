@@ -2,8 +2,6 @@ from project.decoration.base_decoration import BaseDecoration
 
 
 class DecorationRepository:
-    DECORATION_TYPES = ["Plant", "Ornament"]
-
     def __init__(self) -> None:
         self.decorations: list[BaseDecoration] = []
 

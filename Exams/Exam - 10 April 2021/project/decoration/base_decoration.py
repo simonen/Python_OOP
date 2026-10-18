@@ -1,8 +1,7 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 
 class BaseDecoration(ABC):
-
-    def __init__(self, comfort: int, price: float):
+    def __init__(self, comfort: int, price: float) -> None:
         self.comfort = comfort
         self.price = price

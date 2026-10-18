@@ -11,17 +11,23 @@ class ManagingApp:
         self.vehicles: list[BaseVehicle] = []
         self.routes: list[Route] = []
 
-    def _find_by_driving_license(self, driving_license_number: str) -> User | None:
-        user = next((x for x in self.users if x.driving_license_number == driving_license_number), None)
-        return user
-
-    def _find_route_by_id(self, route_id: int) -> Route | None:
+    def _get_route(self, route_id: int) -> Route:
         route = next((x for x in self.routes if x.route_id == route_id), None)
-        return route
+        if route is not None:
+            return route
+        raise Exception(f"Route: {route_id} not found")
 
-    def _find_vehicle_by_license_number(self, license_plate_number: str) -> BaseVehicle | None:
+    def _get_vehicle(self, license_plate_number: str) -> BaseVehicle:
         vehicle = next((x for x in self.vehicles if x.license_plate_number == license_plate_number), None)
-        return vehicle
+        if vehicle is not None:
+            return vehicle
+        raise Exception(f"Vehicle with license plate number: {license_plate_number} not found.")
+
+    def _get_user(self, driving_license_number: str) -> User:
+        user = next((x for x in self.users if x.driving_license_number == driving_license_number), None)
+        if user is not None:
+            return user
+        raise Exception(f"User with driving license: {driving_license_number} not found.")
 
     def register_user(self, first_name: str, last_name: str, driving_license_number: str) -> str:
         if any(x for x in self.users if x.driving_license_number == driving_license_number):
@@ -59,34 +65,16 @@ class ManagingApp:
 
         return f"{start_point}/{end_point} - {length} km is unlocked and available to use."
 
-    def _valid_route(self, route_id: int) -> Route:
-        route = self._find_route_by_id(route_id)
-        if route is not None:
-            return route
-        raise Exception(f"Route: {route_id} not found")
-
-    def _valid_vehicle(self, license_plate_number: str) -> BaseVehicle:
-        vehicle = self._find_vehicle_by_license_number(license_plate_number)
-        if vehicle is not None:
-            return vehicle
-        raise Exception(f"Vehicle with license plate number: {license_plate_number} not found.")
-
-    def _valid_user(self, driving_license_number: str) -> User:
-        user = self._find_by_driving_license(driving_license_number)
-        if user is not None:
-            return user
-        raise Exception(f"User with driving license: {driving_license_number} not found.")
-
     def make_trip(self, driving_license_number: str, license_plate_number: str, route_id: int,  is_accident_happened: bool) -> str:
-        user = self._valid_user(driving_license_number)
+        user = self._get_user(driving_license_number)
         if user.is_blocked:
             return f"User {driving_license_number} is blocked in the platform! This trip is not allowed."
 
-        vehicle = self._valid_vehicle(license_plate_number)
+        vehicle = self._get_vehicle(license_plate_number)
         if vehicle.is_damaged:
             return f"Vehicle {license_plate_number} is damaged! This trip is not allowed."
 
-        route = self._valid_route(route_id)
+        route = self._get_route(route_id)
         if route.is_locked:
             return f"Route {route_id} is locked! This trip is not allowed."
 
@@ -115,5 +103,7 @@ class ManagingApp:
         res = ["*** E-Drive-Rent ***"]
         sorted_users = sorted(self.users, key=lambda x: x.rating, reverse=True)
         res.extend(map(str, sorted_users))
+        # for i in sorted_users:
+        #     res.append(str(i))
 
         return "\n".join(res)

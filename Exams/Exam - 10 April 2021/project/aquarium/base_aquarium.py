@@ -4,6 +4,8 @@ from project.fish.base_fish import BaseFish
 
 
 class BaseAquarium(ABC):
+    FISH_TYPES = []
+
     def __init__(self, name: str, capacity: int):
         self.name = name
         self.capacity = capacity

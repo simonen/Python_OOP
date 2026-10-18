@@ -8,7 +8,7 @@ class User:
 
     @staticmethod
     def is_valid(string) -> bool:
-        if len(string.strip()) != 0:
+        if string.strip():
             return True
 
         return False

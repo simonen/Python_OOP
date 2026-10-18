@@ -1,13 +1,5 @@
-from project.decoration.base_decoration import BaseDecoration
 from project.decoration.plant import Plant
 from project.decoration.ornament import Ornament
-from project.decoration.decoration_repository import DecorationRepository
-from project.fish.base_fish import BaseFish
-from project.fish.freshwater_fish import FreshwaterFish
-from project.fish.saltwater_fish import SaltwaterFish
-from project.aquarium.base_aquarium import BaseAquarium
-from project.aquarium.freshwater_aquarium import FreshwaterAquarium
-from project.aquarium.saltwater_aquarium import SaltwaterAquarium
 
 from project.controller import Controller
 

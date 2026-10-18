@@ -13,11 +13,11 @@ class Controller:
     VALID_AQUARIUMS = {"FreshwaterAquarium": FreshwaterAquarium, "SaltwaterAquarium": SaltwaterAquarium}
     VALID_FISH = {"FreshwaterFish": FreshwaterFish, "SaltwaterFish": SaltwaterFish}
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.decorations_repository: DecorationRepository = DecorationRepository()
         self.aquariums: list[BaseAquarium] = []
 
-    def _get_aquarium(self, aquarium_name: str):
+    def _get_aquarium(self, aquarium_name: str) -> BaseAquarium:
         aquarium = next((x for x in self.aquariums if x.name == aquarium_name), None)
         if aquarium is not None:
             return aquarium

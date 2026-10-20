@@ -1,20 +1,18 @@
-from typing import List
 from project.driver import Driver
 
 
 class Race:
-
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         self.name = name
-        self.drivers: List[Driver] = []
+        self.drivers: list[Driver] = []
 
     @property
     def name(self):
-        return self.__name
+        return self._name
 
     @name.setter
-    def name(self, value):
-        if len(value.strip()) == 0:
+    def name(self, value: str):
+        if not value.split():
             raise ValueError("Name cannot be an empty string!")
 
-        self.__name = value
+        self._name = value

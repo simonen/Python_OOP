@@ -109,8 +109,8 @@ class Controller:
         return "\n".join(res)
 
     # def add_car_to_driver(self, ...): Validate the car_type inside the next() with default dict value .get(car_type, type(None))
-        car = next(
-            (i for i in self.cars[::-1] if isinstance(i, self.VALID_CARS.get(car_type, type(None))) and not i.is_taken),
-            None)
-        if car_type not in self.VALID_CARS or car is None or all(x.is_taken for x in self.cars):
-            raise Exception(f"Car {car_type} could not be found!")
+    #     car = next(
+    #         (i for i in self.cars[::-1] if isinstance(i, self.VALID_CARS.get(car_type, type(None))) and not i.is_taken),
+    #         None)
+    #     if car_type not in self.VALID_CARS or car is None or all(x.is_taken for x in self.cars):
+    #         raise Exception(f"Car {car_type} could not be found!")

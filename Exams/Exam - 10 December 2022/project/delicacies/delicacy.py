@@ -1,35 +1,32 @@
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 
 
 class Delicacy(ABC):
-
-    def __init__(self, name: str, portion: int, price: float):
+    def __init__(self, name: str, portion: int, price: float) -> None:
         self.name = name
-        self.portion = portion
+        self.portion = portion  # grams
         self.price = price
-
-    @abstractmethod
-    def details(self) -> str:
-        pass
 
     @property
     def name(self):
-        return self.__name
+        return self._name
 
     @name.setter
-    def name(self, value):
-        if len(value.strip()) == 0:
+    def name(self, value: str):
+        if not value.split():
             raise ValueError("Name cannot be null or whitespace!")
-
-        self.__name = value
+        self._name = value
 
     @property
     def price(self):
-        return self.__price
+        return self._price
 
     @price.setter
-    def price(self, value):
-        if value <= 0:
+    def price(self, value: float):
+        if value <= 0.0:
             raise ValueError("Price cannot be less or equal to zero!")
+        self._price = value
 
-        self.__price = value
+    @abstractmethod
+    def details(self):
+        ...

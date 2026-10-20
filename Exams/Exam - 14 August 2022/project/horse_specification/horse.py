@@ -1,39 +1,36 @@
-from abc import abstractmethod, ABC
+from abc import ABC,abstractmethod
 
 
 class Horse(ABC):
+    _SPEED_INCREASE: int
+    _MAX_SPEED: int
 
-    def __init__(self, name: str, speed: int):
+    def __init__(self, name: str, speed: int) -> None:
         self.name = name
-        self._speed = None
-        self.speed = speed  # We use the setter method here to validate the speed
-        self.is_taken: bool = False
+        self.speed = speed
+        self.is_taken = False
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value: str):
+        if len(value) < 4:
+            raise ValueError(f"Horse name {value} is less than 4 symbols!")
+
+        self._name = value
 
     @property
     def speed(self):
         return self._speed
 
     @speed.setter
-    def speed(self, new_speed):
-        max_speed = self._get_max_speed()
-        if new_speed > max_speed:
+    def speed(self, value: int):
+        if value > self._MAX_SPEED:
             raise ValueError("Horse speed is too high!")
-        self._speed = new_speed
 
-    def _get_max_speed(self):
-        pass  # This is meant to be overridden in subclasses
+        self._speed = value
 
-    @abstractmethod
     def train(self):
-        pass
-
-    @property
-    def name(self):
-        return self.__name
-
-    @name.setter
-    def name(self, value):
-        if len(value.strip()) < 4:
-            raise ValueError(f"Horse name {value} is less than 4 symbols!")
-
-        self.__name = value
+        self.speed += self._SPEED_INCREASE

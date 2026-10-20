@@ -32,7 +32,7 @@ class HorseRaceApp:
         return f"{horse_type} horse {horse_name} is added."
 
     def add_jockey(self, jockey_name: str, age: int) -> str:
-        if any(x for x in self.jockeys if x.name == jockey_name):
+        if self._find_jockey(jockey_name) is not None:
             raise Exception(f"Jockey {jockey_name} has been already added!")
 
         jockey = Jockey(jockey_name, age)
@@ -41,7 +41,7 @@ class HorseRaceApp:
         return f"Jockey {jockey_name} is added."
 
     def create_horse_race(self, race_type: str):
-        if any(x for x in self.horse_races if x.race_type == race_type):
+        if self._find_race(race_type) is not None:
             raise Exception(f"Race {race_type} has been already created!")
 
         horse_race = HorseRace(race_type)

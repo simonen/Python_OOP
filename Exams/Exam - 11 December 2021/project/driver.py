@@ -1,20 +1,16 @@
-from project.car.car import Car
-
-
 class Driver:
-
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         self.name = name
-        self.car: Car = None
-        self.number_of_wins = 0
+        self.car = None
+        self.number_of_wins: int = 0
 
     @property
     def name(self):
-        return self.__name
+        return self._name
 
     @name.setter
-    def name(self, value):
-        if len(value.strip()) == 0:
+    def name(self, value: str):
+        if not value.split():
             raise ValueError("Name should contain at least one character!")
 
-        self.__name = value
+        self._name = value

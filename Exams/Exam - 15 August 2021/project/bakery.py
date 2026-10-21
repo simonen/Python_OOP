@@ -10,9 +10,11 @@ from project.table.table import Table
 
 
 class Bakery:
-    VALID_FOOD = {"Bread": Bread, "Cake": Cake}
-    VALID_DRINK = {"Tea": Tea, "Water": Water}
-    VALID_TABLE = {"InsideTable": InsideTable, "OutsideTable": OutsideTable}
+    _VALID_FOODS = {"Bread": Bread, "Cake": Cake}
+    _VALID_DRINKS = {"Tea": Tea, "Water": Water}
+    _VALID_TABLES = {"InsideTable": InsideTable, "OutsideTable": OutsideTable}
+    _ORDER_ATTRS = {"Food": ("food_menu", "food_orders"),
+                   "Drink": ("drinks_menu", "drink_orders")}
 
     def __init__(self, name: str) -> None:
         self.name = name
@@ -36,35 +38,35 @@ class Bakery:
         return next((x for x in self.tables_repository if x.table_number == table_number), None)
 
     def add_food(self, food_type: str, name: str, price: float):
-        if food_type not in self.VALID_FOOD:
+        if food_type not in self._VALID_FOODS:
             return None
 
         if next((x for x in self.food_menu if x.name == name), None) is not None:
             raise Exception(f"{food_type} {name} is already in the menu!")
 
-        food = self.VALID_FOOD[food_type](name, price)
+        food = self._VALID_FOODS[food_type](name, price)
         self.food_menu.append(food)
         return f"Added {name} ({food_type}) to the food menu"
 
     def add_drink(self, drink_type: str, name: str, portion: float, brand:str):
-        if drink_type not in self.VALID_DRINK:
+        if drink_type not in self._VALID_DRINKS:
             return None
 
         if next((x for x in self.drinks_menu if x.name == name), None) is not None:
             raise Exception(f"{drink_type} {name} is already in the menu!")
 
-        drink = self.VALID_DRINK[drink_type](name, portion, brand)
+        drink = self._VALID_DRINKS[drink_type](name, portion, brand)
         self.drinks_menu.append(drink)
         return f"Added {name} ({brand}) to the drink menu"
 
     def add_table(self, table_type: str, table_number: int, capacity: int):
-        if table_type not in self.VALID_TABLE:
+        if table_type not in self._VALID_TABLES:
             return None
 
         if self._find_table(table_number) is not None:
             raise Exception(f"Table {table_number} is already in the bakery!")
 
-        table = self.VALID_TABLE[table_type](table_number, capacity)
+        table = self._VALID_TABLES[table_type](table_number, capacity)
         self.tables_repository.append(table)
         return f"Added table number {table_number} in the bakery"
 
@@ -81,10 +83,9 @@ class Bakery:
         if table is None:
             return f"Could not find table {table_number}"
 
-        order_attrs = {"Food": (self.food_menu, table.food_orders),
-                       "Drink": (self.drinks_menu, table.drink_orders)}
-
-        menu, table_order = order_attrs[item_type]
+        menu_attrs, orders_attrs = self._ORDER_ATTRS[item_type]
+        menu = getattr(self, menu_attrs)
+        table_order = getattr(table, orders_attrs)
         ordered, unavailable = [], []
 
         for item in items:

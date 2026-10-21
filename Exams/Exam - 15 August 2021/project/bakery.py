@@ -81,20 +81,23 @@ class Bakery:
         if table is None:
             return f"Could not find table {table_number}"
 
-        res = [f"Table {table_number} ordered:"]
-        not_available = [f"{self.name} does not have in the menu:"]
-        menu = self.food_menu if item_type == "Food" else self.drinks_menu
-        table_orders = table.food_orders if item_type == "Food" else table.drink_orders
+        order_attrs = {"Food": (self.food_menu, table.food_orders),
+                       "Drink": (self.drinks_menu, table.drink_orders)}
+
+        menu, table_order = order_attrs[item_type]
+        ordered, unavailable = [], []
 
         for item in items:
             product = next((x for x in menu if x.name == item), None)
             if product is None:
-                not_available.append(item)
+                unavailable.append(item)
             else:
-                res.append(str(product))
-                table_orders.append(product)
+                ordered.append(str(product))
+                table_order.append(product)
 
-        return "\n".join(res + not_available)
+        res = [f"Table {table_number} ordered:", *ordered, f"{self.name} does not have in the menu:", *unavailable]
+
+        return "\n".join(res)
 
     def order_food (self, table_number: int, *food_names):
         return self.order_item(table_number, *food_names, item_type="Food")

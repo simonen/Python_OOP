@@ -2,11 +2,15 @@ from project.software.software import Software
 
 
 class Hardware:
-    def __init__(self, name: str, hardware_type: str, capacity: int, memory: int) -> None:
+    _TYPE: str
+    _CAP_FACTOR: float
+    _MEM_FACTOR: float
+
+    def __init__(self, name: str, capacity: int, memory: int) -> None:
         self.name = name
-        self.hardware_type = hardware_type
-        self.capacity = capacity
-        self.memory = memory
+        self.hardware_type = self._TYPE
+        self.capacity = int(capacity * self._CAP_FACTOR)
+        self.memory = int(memory * self._MEM_FACTOR)
         self.software_components: list[Software] = []
 
     def install(self, software: Software):

@@ -1,20 +1,26 @@
-from abc import abstractmethod, ABC
-from typing import List
+from abc import ABC
 
 
 class Musician(ABC):
-    VALID_SKILLS = {"Guitarist": ["play metal", "play rock", "play jazz"],
-                    "Drummer": ["play the drums with drumsticks", "play the drums with drum brushes", "read sheet music"],
-                    "Singer": ["sing high pitch notes", "sing low pitch notes"]}
+    _SKILLS = {"Singer": ("sing high pitch notes", "sing low pitch notes"),
+               "Drummer": ("play the drums with drumsticks", "play the drums with drum brushes", "read sheet music"),
+               "Guitarist": ("play metal", "play rock", "play jazz")}
 
-    def __init__(self, name: str, age: int):
+    def __init__(self, name: str, age: int) -> None:
         self.name = name
         self.age = age
-        self.skills: List[str] = []
+        self.skills: list[str] = []
 
-    @abstractmethod
     def learn_new_skill(self, new_skill: str):
-        pass
+        if new_skill not in self._SKILLS[self.__class__.__name__]:
+            raise ValueError(f"{new_skill} is not a needed skill!")
+
+        if new_skill in self.skills:
+            raise ValueError(f"{new_skill} is already learned!")
+
+        self.skills.append(new_skill)
+
+        return f"{self.name} learned to {new_skill}."
 
     @property
     def name(self):
@@ -22,7 +28,7 @@ class Musician(ABC):
 
     @name.setter
     def name(self, value):
-        if len(value.strip()) == 0:
+        if not value.strip():
             raise ValueError("Musician name cannot be empty!")
 
         self.__name = value

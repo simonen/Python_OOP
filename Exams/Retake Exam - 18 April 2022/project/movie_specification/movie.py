@@ -8,6 +8,10 @@ class Movie(ABC):
 
     def __init_subclass__(cls, **kwargs) -> None:
         super().__init_subclass__(**kwargs)
+        if cls.__name__ not in Movie._AGE_RESTRICTIONS:
+            raise TypeError( f"{cls.__name__} is not in _AGE_RESTRICTIONS — "
+            f"add it or set a default explicitly.")
+
         cls._default_age_restriction = Movie._AGE_RESTRICTIONS.get(cls.__name__)
 
     def __init__(self, title: str, year: int, owner: User, age_restriction: int | None = None) -> None:

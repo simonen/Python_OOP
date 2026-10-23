@@ -1,5 +1,5 @@
 class Concert:
-    _CONCERTS = {"Rock": ("play the drums with drumsticks", "sing high pitch notes", "play rock"),
+    _GENRES = {"Rock": ("play the drums with drumsticks", "sing high pitch notes", "play rock"),
                  "Metal": ("play the drums with drumsticks", "sing low pitch notes", "play metal"),
                  "Jazz": ("play the drums with drum brushes", "sing high pitch notes", "sing low pitch notes")}
 
@@ -11,12 +11,16 @@ class Concert:
         self.place = place
 
     @property
+    def genres(self):
+        return self._GENRES
+
+    @property
     def genre(self):
         return self._genre
 
     @genre.setter
     def genre(self, value: str):
-        if value not in self._CONCERTS:
+        if value not in self._GENRES:
             raise ValueError(f"Our group doesn't play {value}!")
 
         self._genre = value

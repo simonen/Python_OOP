@@ -1,92 +1,92 @@
-from typing import List
 from project.band_members.musician import Musician
-from project.band_members.drummer import Drummer
 from project.band_members.guitarist import Guitarist
+from project.band_members.drummer import Drummer
 from project.band_members.singer import Singer
-from project.band import Band
 from project.concert import Concert
+from project.band import Band
 
 
 class ConcertTrackerApp:
+    _VALID_MUSICIANS = {"Guitarist": Guitarist, "Drummer": Drummer, "Singer": Singer}
 
     def __init__(self):
-        self.bands: List[Band] = []
-        self.musicians: List[Drummer, Guitarist, Singer] = []
-        self.concerts: List[Concert] = []
+        self.bands: list[Band] = []
+        self.musicians: list[Musician] = []
+        self.concerts: list[Concert] = []
 
-    def create_musician(self, musician_type: str, name: str, age: int) -> str:
-        if musician_type not in ["Guitarist", "Drummer", "Singer"]:
+    def _find_band(self, band_name: str) -> Band | None:
+        return next((x for x in self.bands if x.name == band_name), None)
+
+    def _find_musician(self, musician_name: str) -> Musician | None:
+        return next((x for x in self.musicians if x.name == musician_name), None)
+
+    def create_musician(self, musician_type: str, name: str, age: int):
+        if musician_type not in self._VALID_MUSICIANS:
             raise ValueError("Invalid musician type!")
 
-        if any(m for m in self.musicians if m.name == name):
+        if self._find_musician(name) is not None:
             raise Exception(f"{name} is already a musician!")
 
-        new_musician = globals()[musician_type](name, age)
-        self.musicians.append(new_musician)
+        musician = self._VALID_MUSICIANS[musician_type](name, age)
+        self.musicians.append(musician)
 
         return f"{name} is now a {musician_type}."
 
-    def create_band(self, name: str) -> str:
-        if any(b for b in self.bands if b.name == name):
+    def create_band(self, name: str):
+        if self._find_band(name) is not None:
             raise Exception(f"{name} band is already created!")
 
-        new_band = Band(name)
-        self.bands.append(new_band)
+        band = Band(name)
+        self.bands.append(band)
 
         return f"{name} was created."
 
-    def create_concert(self, genre: str, audience: int, ticket_price: float, expenses: float, place: str) -> str:
-        current_concert = next((c for c in self.concerts if c.place == place), None)
-        if current_concert:
-            concert_genre = current_concert.genre
-            raise Exception(f"{place} is already registered for {concert_genre} concert!")
+    def create_concert(self, genre: str, audience: int, ticket_price: float, expenses: float, place: str):
+        if any(x for x in self.concerts if x.place == place):
+            raise Exception(f"{place} is already registered for {genre} concert!")
 
-        new_concert = Concert(genre, audience, ticket_price, expenses, place)
-        self.concerts.append(new_concert)
+        concert = Concert(genre, audience, ticket_price, expenses, place)
+        self.concerts.append(concert)
 
         return f"{genre} concert in {place} was added."
 
     def add_musician_to_band(self, musician_name: str, band_name: str):
-        musician = next((m for m in self.musicians if m.name == musician_name), None)
-        if not musician:
+        musician = self._find_musician(musician_name)
+        if musician is None:
             raise Exception(f"{musician_name} isn't a musician!")
 
-        band = self.valid_band(band_name)
-        band.members.append(musician)
+        band = self._find_band(band_name)
+        if band is None:
+            raise Exception(f"{band_name} isn't a band!")
 
+        band.members.append(musician)
         return f"{musician_name} was added to {band_name}."
 
-    def remove_musician_from_band(self, musician_name: str, band_name: str) -> str or None:
-        band = self.valid_band(band_name)
-        musician = next((m for m in band.members if m.name == musician_name), None)
-        if not musician:
+    def remove_musician_from_band(self, musician_name: str, band_name: str):
+        band = self._find_band(band_name)
+        if band is None:
+            raise Exception(f"{band_name} isn't a band!")
+
+        musician = self._find_musician(musician_name)
+        if musician is None:
             raise Exception(f"{musician_name} isn't a member of {band_name}!")
 
         band.members.remove(musician)
-
         return f"{musician_name} was removed from {band_name}."
 
-    def start_concert(self, concert_place: str, band_name: str) -> str or None:
-        band = next(b for b in self.bands if b.name == band_name)
-        musician_types = [m for m in list(map(lambda x: x.__class__.__name__, band.members))]
-        concert = next(c for c in self.concerts if c.place == concert_place)
+    def start_concert(self, concert_place: str, band_name: str):
+        band = self._find_band(band_name)
+        if band is None:
+            return None
 
-        req = ["Guitarist", "Drummer", "Singer"]
-        if set(req) != set(musician_types):
+        if set(x.__class__.__name__ for x in band.members) != set(self._VALID_MUSICIANS):
             raise Exception(f"{band_name} can't start the concert because it doesn't have enough members!")
 
-        band_skills_nested = [m.skills for m in band.members]
-        band_skills = [skill for sublist in band_skills_nested for skill in sublist]
+        concert = next((x for x in self.concerts if x.place == concert_place))
+        band_skills = [skill for member in band.members for skill in member.skills]
 
-        if not set(Concert.concertz[concert.genre]).issubset(set(band_skills)):
+        if not set(concert._CONCERTS[concert.genre]).issubset(set(band_skills)):
             raise Exception(f"The {band_name} band is not ready to play at the concert!")
 
-        return f"{band_name} gained {((concert.audience * concert.ticket_price) - concert.expenses):.2f}$" \
-               f" from the {concert.genre} concert in {concert_place}."
-
-    def valid_band(self, band_name):
-        band = next((b for b in self.bands if b.name == band_name), None)
-        if not band:
-            raise Exception(f"{band_name} isn't a band!")
-
-        return band
+        profit = concert.audience * concert.ticket_price - concert.expenses
+        return f"{band_name} gained {profit:.2f}$ from the {concert.genre} concert in {concert_place}."

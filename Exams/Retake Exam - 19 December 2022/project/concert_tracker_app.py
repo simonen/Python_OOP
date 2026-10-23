@@ -85,7 +85,7 @@ class ConcertTrackerApp:
         concert = next((x for x in self.concerts if x.place == concert_place))
         band_skills = [skill for member in band.members for skill in member.skills]
 
-        if not set(concert._CONCERTS[concert.genre]).issubset(set(band_skills)):
+        if not set(concert.genres[concert.genre]).issubset(set(band_skills)):
             raise Exception(f"The {band_name} band is not ready to play at the concert!")
 
         profit = concert.audience * concert.ticket_price - concert.expenses

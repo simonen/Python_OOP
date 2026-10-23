@@ -1,9 +1,7 @@
 class Concert:
-    concertz = {
-        'Rock': ['play the drums with drumsticks', 'sing high pitch notes', 'play rock'],
-        'Metal': ['play the drums with drumsticks', 'sing low pitch notes', 'play metal'],
-        'Jazz': ['play the drums with drum brushes', 'sing high pitch notes', 'sing low pitch notes', 'play jazz']
-    }
+    _CONCERTS = {"Rock": ("play the drums with drumsticks", "sing high pitch notes", "play rock"),
+                 "Metal": ("play the drums with drumsticks", "sing low pitch notes", "play metal"),
+                 "Jazz": ("play the drums with drum brushes", "sing high pitch notes", "sing low pitch notes")}
 
     def __init__(self, genre: str, audience: int, ticket_price: float, expenses: float, place: str):
         self.genre = genre
@@ -14,59 +12,58 @@ class Concert:
 
     @property
     def genre(self):
-        return self.__genre
+        return self._genre
 
     @genre.setter
-    def genre(self, value):
-        genres = ["Metal", "Rock", "Jazz"]
-        if value not in genres:
+    def genre(self, value: str):
+        if value not in self._CONCERTS:
             raise ValueError(f"Our group doesn't play {value}!")
 
-        self.__genre = value
+        self._genre = value
 
     @property
     def audience(self):
-        return self.__audience
+        return self._audience
 
     @audience.setter
-    def audience(self, value):
+    def audience(self, value: int):
         if value < 1:
             raise ValueError("At least one person should attend the concert!")
 
-        self.__audience = value
+        self._audience = value
 
     @property
     def ticket_price(self):
-        return self.__ticket_price
+        return self._ticket_price
 
     @ticket_price.setter
-    def ticket_price(self, value):
-        if value < 1.00:
+    def ticket_price(self, value: float):
+        if value < 1.0:
             raise ValueError("Ticket price must be at least 1.00$!")
 
-        self.__ticket_price = value
+        self._ticket_price = value
 
     @property
     def expenses(self):
-        return self.__expenses
+        return self._expenses
 
     @expenses.setter
-    def expenses(self, value):
+    def expenses(self, value: int):
         if value < 0:
             raise ValueError("Expenses cannot be a negative number!")
 
-        self.__expenses = value
+        self._expenses = value
 
     @property
     def place(self):
-        return self.__place
+        return self._place
 
     @place.setter
-    def place(self, value):
-        if len(value.strip()) < 2:
+    def place(self, value: str):
+        if len(value) < 2 or not value.split():
             raise ValueError("Place must contain at least 2 chars. It cannot be empty!")
 
-        self.__place = value
+        self._place = value
 
     def __str__(self) -> str:
         return f"{self.genre} concert at {self.place}."

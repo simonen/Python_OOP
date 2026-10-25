@@ -1,21 +1,21 @@
-from typing import List
 from project.meals.meal import Meal
 
 
 class Client:
-
-    def __init__(self, phone_number: str):
+    def __init__(self, phone_number: str) -> None:
         self.phone_number = phone_number
-        self.shopping_cart: List[Meal] = []
-        self.bill = 0
+        self.shopping_cart: list[Meal] = []
+        self.bill: float = 0.0
 
     @property
     def phone_number(self):
-        return self.__phone_number
+        return self._phone_number
 
     @phone_number.setter
-    def phone_number(self, value):
-        if value[0] != '0' or len(value) != 10 or not all(x.isdigit() for x in value):
+    def phone_number(self, value: str):
+        if (any(not n.isdigit() for n in value)
+                or len(value) != 10
+                or value[0] != "0"):
             raise ValueError("Invalid phone number!")
 
-        self.__phone_number = value
+        self._phone_number = value

@@ -15,7 +15,7 @@ class Room:
         self.expenses = 0
 
     @property
-    def room_cost(self):
+    def room_cost(self) -> float | int:
         return self._ROOM_COST
 
     @property
@@ -23,7 +23,7 @@ class Room:
         return self.calculate_expenses(*self.children, *self.appliances)
 
     @property
-    def expenses(self):
+    def expenses(self) -> float:
         return self._expenses
 
     @expenses.setter
@@ -33,8 +33,9 @@ class Room:
 
         self._expenses = value
 
-    def calculate_expenses(self, *args: Child | Appliance):
-        return sum(x.get_monthly_expense() for x in args) + self.room_cost
+    def calculate_expenses(self, *items: Child | Appliance) -> float:
+        """Sum room cost plus monthly expenses of appliances and children (if any)"""
+        return self.room_cost + sum(item.get_monthly_expense() for item in items)
 
     def count_residents(self) -> int:
         return self.members_count + len(self.children)

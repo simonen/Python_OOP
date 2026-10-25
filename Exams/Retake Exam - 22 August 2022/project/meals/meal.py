@@ -1,23 +1,33 @@
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
+from typing import ClassVar
 
 
 class Meal(ABC):
-    def __init__(self, name: str, price: float, quantity: int):
+    # _QUANTITY: ClassVar[int]
+    _QUANTITY = {"Starter": 60, "MainDish": 50, "Dessert": 30}
+    _default_quantity: int | None = None
+
+    def __init_subclass__(cls) -> None:
+        super().__init_subclass__()
+        cls._default_quantity = Meal._QUANTITY[cls.__name__]
+        print(cls.__dict__)
+
+    def __init__(self, name: str, price: float, quantity: int | None = None) -> None:
         self.name = name
         self.price = price
-        self.quantity = quantity
+        self.quantity = quantity if quantity is not None else self._default_quantity
 
     @abstractmethod
     def details(self):
-        pass
+        ...
 
     @property
     def name(self):
         return self.__name
 
     @name.setter
-    def name(self, value):
-        if len(value.strip()) == 0:
+    def name(self, value: str):
+        if not value.split():
             raise ValueError("Name cannot be an empty string!")
 
         self.__name = value
@@ -27,7 +37,7 @@ class Meal(ABC):
         return self.__price
 
     @price.setter
-    def price(self, value):
+    def price(self, value: float):
         if value <= 0:
             raise ValueError("Invalid price!")
 

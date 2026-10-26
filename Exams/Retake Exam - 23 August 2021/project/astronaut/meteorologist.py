@@ -2,11 +2,8 @@ from project.astronaut.astronaut import Astronaut
 
 
 class Meteorologist(Astronaut):
+    _DECREASE_AMOUNT = 15
 
-    OXYGEN = 90
-
-    def __init__(self, name: str):
-        super().__init__(name, self.OXYGEN)
-
-    def breathe(self):
-        self.oxygen -= 15
+    @property
+    def _INITIAL_OXYGEN(self) -> int:
+        return 90

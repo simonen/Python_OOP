@@ -1,14 +1,9 @@
 from project.astronaut.astronaut import Astronaut
-from project.astronaut.biologist import Biologist
-from project.astronaut.geodesist import Geodesist
-from project.astronaut.meteorologist import Meteorologist
-from typing import List
 
 
 class AstronautRepository:
-
     def __init__(self):
-        self.astronauts: List[Astronaut] = []
+        self.astronauts: list[Astronaut] = []
 
     def add(self, astronaut: Astronaut) -> None:
         self.astronauts.append(astronaut)
@@ -16,6 +11,5 @@ class AstronautRepository:
     def remove(self, astronaut: Astronaut) -> None:
         self.astronauts.remove(astronaut)
 
-    def find_by_name(self, name: str):
-        astro = next((a for a in self.astronauts if a.name == name), None)
-        return astro
+    def find_by_name(self, name: str) -> Astronaut | None:
+        return next((astro for astro in self.astronauts if astro.name == name), None)

@@ -2,11 +2,8 @@ from project.astronaut.astronaut import Astronaut
 
 
 class Biologist(Astronaut):
+    _DECREASE_AMOUNT = 5
 
-    OXYGEN = 70
-
-    def __init__(self, name: str):
-        super().__init__(name, self.OXYGEN)
-
-    def breathe(self):
-        self.oxygen -= 5
+    @property
+    def _INITIAL_OXYGEN(self) -> int:
+        return 70

@@ -13,6 +13,5 @@ class PlanetRepository:
     def remove(self, planet: Planet) -> None:
         self.planets.remove(planet)
 
-    def find_by_name(self, name: str) -> str:
-        planet = next((p for p in self.planets if p.name == name), None)
-        return planet
+    def find_by_name(self, name: str):
+        return next((p for p in self.planets if p.name == name), None)

@@ -1,87 +1,93 @@
-from project.astronaut.astronaut import Astronaut
 from project.astronaut.astronaut_repository import AstronautRepository
 from project.astronaut.biologist import Biologist
 from project.astronaut.geodesist import Geodesist
 from project.astronaut.meteorologist import Meteorologist
-from project.planet.planet_repository import PlanetRepository
 from project.planet.planet import Planet
-from project.astronaut.astronaut_repository import AstronautRepository
+from project.planet.planet_repository import PlanetRepository
 
 
 class SpaceStation:
+    DEBUG = True
+    _COLOR = True
+    _RESET, _DIM = "\033[0m", "\033[2m"
+    _GREEN, _YELLOW, _RED, _CYAN = "\033[32m", "\033[33m", "\033[31m", "\033[36m"
+    _ASTRONAUT_TYPES = {"Meteorologist": Meteorologist, "Geodesist": Geodesist, "Biologist": Biologist}
 
     def __init__(self):
-        self.planet_repository = PlanetRepository()
-        self.astronaut_repository = AstronautRepository()
-        self.complete = 0
-        self.incomplete = 0
+        self.planet_repository: PlanetRepository = PlanetRepository()
+        self.astronaut_repository: AstronautRepository = AstronautRepository()
+        self.missions_ok = 0
+        self.missions_fail = 0
+
+    def _debug(self, msg, color=_CYAN):
+        if not self.DEBUG:
+            return
+        c = color if self._COLOR else ""
+        reset = self._RESET if self._COLOR else ""
+        print(f"{c}[DEBUG]: {msg}{reset}")
 
     def add_astronaut(self, astronaut_type: str, name: str) -> str:
-        if self.astronaut_repository.find_by_name(name):
-            return f"{name} is already added."
-
-        if astronaut_type not in ["Biologist", "Geodesist", "Meteorologist"]:
+        if astronaut_type not in self._ASTRONAUT_TYPES:
             raise Exception("Astronaut type is not valid!")
 
-        new_astro = globals()[astronaut_type](name)
-        self.astronaut_repository.add(new_astro)
-        return f"Successfully added {astronaut_type}: {name}."
-
-    def add_planet(self, name: str, items: str) -> str or None:
-        if self.planet_repository.find_by_name(name):
+        if self.astronaut_repository.find_by_name(name) is not None:
             return f"{name} is already added."
 
-        new_planet = Planet(name)
-        new_planet.items.extend(items.split(", "))
-        self.planet_repository.add(new_planet)
+        self.astronaut_repository.add(self._ASTRONAUT_TYPES[astronaut_type](name))
+        return f"Successfully added {astronaut_type}: {name}."
 
+    def add_planet(self, name: str, items: str) -> str:
+        if self.planet_repository.find_by_name(name) is not None:
+            return f"{name} is already added."
+
+        planet = Planet(name)
+        planet.items = items.split(", ")
+        self.planet_repository.add(planet)
         return f"Successfully added Planet: {name}."
 
-    def retire_astronaut(self, name: str) -> str or None:
-        astro = self.astronaut_repository.find_by_name(name)
-        if not astro:
+
+    def retire_astronaut(self, name: str) -> str:
+        astronaut = self.astronaut_repository.find_by_name(name)
+        if astronaut is None:
             raise Exception(f"Astronaut {name} doesn't exist!")
 
-        self.astronaut_repository.remove(astro)
+        self.astronaut_repository.remove(astronaut)
         return f"Astronaut {name} was retired!"
 
     def recharge_oxygen(self) -> None:
         for astro in self.astronaut_repository.astronauts:
-            astro.oxygen += 10
+            astro.increase_oxygen(10)
 
-    def send_on_mission(self, planet_name: str) -> str or None:
+    def send_on_mission(self, planet_name: str) -> str:
         planet = self.planet_repository.find_by_name(planet_name)
-        if not planet:
+        if planet is None:
             raise Exception("Invalid planet name!")
 
-        oxygen_raking = sorted(self.astronaut_repository.astronauts, key=lambda x: -x.oxygen)
-        crew = list(filter(lambda x: x.oxygen > 30, oxygen_raking))[:5]
+        eligible = [a for a in self.astronaut_repository.astronauts if a.oxygen > 30]
+        team = sorted(eligible, key=lambda x: -x.oxygen)[:5]
 
-        if not crew:
+        if not team:
             raise Exception("You need at least one astronaut to explore the planet!")
 
-        collectors = 0
-        while crew and planet.items:
-            if not crew[0].backpack:
-                collectors += 1
-            if crew[0].oxygen > 0:
-                crew[0].backpack.append(planet.items.pop())
-                crew[0].breathe()
-            if crew[0].oxygen == 0:
-                crew.pop(0)
+        for participants, astro in enumerate(team, start=1) :
+            self._debug(f"Astronaut id {participants} {astro.name} went to planet {planet_name}")
+            self._debug(f"Items to collect: {len(planet.items)}", self._GREEN)
+            while planet.items and astro.oxygen > 0:
+                item = planet.items.pop()
+                astro.backpack.append(item)
+                astro.breathe()
+                self._debug(f"Astronaut {astro.name} collected {item}")
+            if not planet.items:
+                self.missions_ok += 1
+                return f"Planet: {planet_name} was explored. {participants} astronauts participated in collecting items."
 
-        if not planet.items:
-            self.complete += 1
-            return f"Planet: {planet_name} was explored. {collectors} astronauts participated in collecting items."
-
-        self.incomplete += 1
-        return "Mission is not completed."
+        self.missions_fail += 1
+        return  "Mission is not completed."
 
     def report(self) -> str:
-        res = [f"{self.complete} successful missions!",
-               f"{self.incomplete} missions were not completed!", "Astronauts' info:"]
+        astro = [f"{str(a)}" for a in self.astronaut_repository.astronauts]
+        res = [f"{self.missions_ok} successful missions!",
+               f"{self.missions_fail} missions were not completed!",
+               "Astronauts' info:"]
 
-        for astro in self.astronaut_repository.astronauts:
-            res.extend(astro.details())
-
-        return '\n'.join(res)
+        return "\n".join(res + astro)

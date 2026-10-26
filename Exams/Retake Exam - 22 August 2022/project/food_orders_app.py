@@ -1,18 +1,32 @@
-from typing import List
-from project.meals.meal import Meal
 from project.client import Client
-import copy
+from project.meals.dessert import Dessert
+from project.meals.main_dish import MainDish
+from project.meals.meal import Meal
+from project.meals.starter import Starter
 
 
 class FoodOrdersApp:
-    receipt_id = 0
+    _VALID_MEALS = {"Dessert": Dessert, "MainDish": MainDish, "Starter": Starter}
+    _RECEIPT = 0
 
-    def __init__(self):
-        self.menu: List[Meal] = []
-        self.clients_list: List[Client] = []
+    def __init__(self) -> None:
+        self.menu: list[Meal] = []
+        self.clients_list: list[Client] = []
 
-    def register_client(self, client_phone_number: str) -> str or None:
-        if any(c for c in self.clients_list if c.phone_number == client_phone_number):
+    @property
+    def menu_ready(self):
+        return True if len(self.menu) >= 5 else False
+
+    def _find_meal(self, meal_name: str) -> Meal | None:
+        return next((meal for meal in self.menu if meal.name == meal_name), None)
+
+    def _find_client(self, phone_number: str) -> Client | None:
+        client = next((c for c in self.clients_list if c.phone_number == phone_number), None)
+        return client
+
+    def register_client(self, client_phone_number: str) -> str:
+        client = self._find_client(client_phone_number)
+        if client is not None:
             raise Exception("The client has already been registered!")
 
         new_client = Client(client_phone_number)
@@ -21,78 +35,77 @@ class FoodOrdersApp:
         return f"Client {client_phone_number} registered successfully."
 
     def add_meals_to_menu(self, *meals: Meal) -> None:
-        for meal in meals:
-            if meal.__class__.__name__ in ["Starter", "MainDish", "Dessert"]:
-                self.menu.append(meal)
+        new_meals = [meal for meal in meals if meal.__class__.__name__ in self._VALID_MEALS]
+        self.menu += new_meals
 
-    def show_menu(self) -> str or None:
+    def show_menu(self):
         if len(self.menu) < 5:
             raise Exception("The menu is not ready!")
 
-        return '\n'.join([m.details() for m in self.menu])
+        meal_details = [meal.details() for meal in self.menu]
+        return "\n".join(meal_details)
 
-    def add_meals_to_shopping_cart(self, client_phone_number: str, **meal_names_and_quantities) -> str or None:
-        client = next((c for c in self.clients_list if c.phone_number == client_phone_number), None)
-        if not client:
+    def add_meals_to_shopping_cart(self, client_phone_number: str, **meal_names_and_quantities) -> str:
+        if not self.menu_ready:
+            raise Exception("The menu is not ready!")
+
+        client = self._find_client(client_phone_number)
+        if client is None:
             client = Client(client_phone_number)
             self.clients_list.append(client)
 
-        if len(self.menu) < 5:
-            raise Exception("The menu is not ready!")
-
-        meals: List[Meal] = []
+        to_add: list[tuple[Meal, int]] = []
         total = 0
-        temp_menu = copy.copy(self.menu)
-        for meal_key, quantity in meal_names_and_quantities.items():
-            meal = next((m for m in temp_menu if m.name == meal_key), None)
-            if not meal:
-                raise Exception(f"{meal_key} is not on the menu!")
-            if quantity > meal.quantity:
-                raise Exception(f"Not enough quantity of {meal.__class__.__name__}: {meal_key}!")
+        # Pass 1: Validate and collect
+        for meal_name, quantity in meal_names_and_quantities.items():
+            meal = self._find_meal(meal_name)
+            if meal is None:
+                raise Exception(f"{meal_name} is not on the menu!")
 
-            user_meal = copy.copy(meal)
-            user_meal.quantity = quantity
-            meals.append(user_meal)
-            total += (quantity * meal.price)
+            if meal.quantity < quantity:
+                raise Exception(f"Not enough quantity of {meal.__class__.__name__}: {meal_name}!")
+
+            to_add.append((meal, quantity))
+            total += meal.price * quantity
+        # Pass 2 Commit: Mutate the menu items only after everything validated
+        for meal, quantity in to_add:
             meal.quantity -= quantity
+            client.shopping_cart.append(type(meal)(meal.name, meal.price, quantity))
 
-        self.menu = temp_menu
-        client.shopping_cart.extend(meals)
         client.bill += total
+        ordered_meals = ", ".join(x.name for x in client.shopping_cart)
+        return f"Client {client_phone_number} successfully ordered {ordered_meals} for {client.bill:.2f}lv."
 
-        return f"Client {client_phone_number} successfully ordered " \
-               f"{', '.join(list(map(lambda x: x.name, client.shopping_cart)))} for {client.bill:.2f}lv."
+    def cancel_order(self, client_phone_number: str):
+        client = self._find_client(client_phone_number)
+        if client is None:
+            return None
 
-    def cancel_order(self, client_phone_number: str) -> str or None:
-        client = next(c for c in self.clients_list if c.phone_number == client_phone_number)
         if not client.shopping_cart:
             raise Exception("There are no ordered meals!")
 
-        for meal in client.shopping_cart:
-            for item in self.menu:
-                if meal.name == item.name:
-                    item.quantity += meal.quantity
+        for item in client.shopping_cart:
+            meal = self._find_meal(item.name)
+            meal.quantity += item.quantity
+            client.bill = 0
+            client.shopping_cart = []
 
-        self.empty_cart(client)
+        return f"Client {client.phone_number} successfully canceled his order."
 
-        return f"Client {client_phone_number} successfully canceled his order."
+    def finish_order(self, client_phone_number: str):
+        client = self._find_client(client_phone_number)
+        if client is None:
+            return None
 
-    def finish_order(self, client_phone_number: str) -> str or None:
-        client = next(c for c in self.clients_list if c.phone_number == client_phone_number)
         if not client.shopping_cart:
             raise Exception("There are no ordered meals!")
 
-        paid = client.bill
-        self.empty_cart(client)
-        self.receipt_id += 1
+        paid_bill = client.bill
+        client.bill = 0
+        client.shopping_cart = []
+        self._RECEIPT += 1
 
-        return f"Receipt #{self.receipt_id} with total amount of " \
-               f"{paid:.2f} was successfully paid for {client_phone_number}."
+        return f"Receipt #{self._RECEIPT} with total amount of {paid_bill:.2f} was successfully paid for {client_phone_number}."
 
     def __str__(self) -> str:
         return f"Food Orders App has {len(self.menu)} meals on the menu and {len(self.clients_list)} clients."
-
-    @staticmethod
-    def empty_cart(client: Client) -> None:
-        client.shopping_cart = []
-        client.bill = 0

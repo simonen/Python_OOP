@@ -7,8 +7,8 @@ from project.delicacies.stolen import Stolen
 
 
 class ChristmasPastryShopApp:
-    DELICACIES = {"Gingerbread": Gingerbread, "Stolen": Stolen}
-    BOOTHS = {"Open Booth": OpenBooth, "Private Booth": PrivateBooth}
+    _DELICACIES = {"Gingerbread": Gingerbread, "Stolen": Stolen}
+    _BOOTHS = {"Open Booth": OpenBooth, "Private Booth": PrivateBooth}
 
     def __init__(self) -> None:
         self.booths: list[Booth] = []
@@ -20,23 +20,23 @@ class ChristmasPastryShopApp:
         return booth
 
     def add_delicacy(self, type_delicacy: str, name: str, price: float):
-        if type_delicacy not in ChristmasPastryShopApp.DELICACIES:
+        if type_delicacy not in ChristmasPastryShopApp._DELICACIES:
             raise Exception(f"{type_delicacy} is not on our delicacy menu!")
 
         if any(x for x in self.delicacies if x.name == name):
             raise Exception(f"{name} already exists!")
 
-        delicacy = ChristmasPastryShopApp.DELICACIES[type_delicacy](name, price)
+        delicacy = ChristmasPastryShopApp._DELICACIES[type_delicacy](name, price)
         self.delicacies.append(delicacy)
         return f"Added delicacy {name} - {type_delicacy} to the pastry shop."
 
     def add_booth(self, type_booth: str, booth_number: int, capacity: int):
-        if type_booth not in ChristmasPastryShopApp.BOOTHS:
+        if type_booth not in ChristmasPastryShopApp._BOOTHS:
             raise Exception(f"{type_booth} is not a valid booth!")
         if self._find_by_booth_number(booth_number) is not None:
             raise Exception(f"Booth number {booth_number} already exists!")
 
-        booth = ChristmasPastryShopApp.BOOTHS[type_booth](booth_number, capacity)
+        booth = ChristmasPastryShopApp._BOOTHS[type_booth](booth_number, capacity)
         self.booths.append(booth)
         return f"Added booth number {booth_number} in the pastry shop."
 

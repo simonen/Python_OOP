@@ -9,9 +9,9 @@ from project.fish.saltwater_fish import SaltwaterFish
 
 
 class Controller:
-    VALID_DECORATIONS = {"Ornament": Ornament, "Plant": Plant}
-    VALID_AQUARIUMS = {"FreshwaterAquarium": FreshwaterAquarium, "SaltwaterAquarium": SaltwaterAquarium}
-    VALID_FISH = {"FreshwaterFish": FreshwaterFish, "SaltwaterFish": SaltwaterFish}
+    _VALID_DECORATIONS = {"Ornament": Ornament, "Plant": Plant}
+    _VALID_AQUARIUMS = {"FreshwaterAquarium": FreshwaterAquarium, "SaltwaterAquarium": SaltwaterAquarium}
+    _VALID_FISH = {"FreshwaterFish": FreshwaterFish, "SaltwaterFish": SaltwaterFish}
 
     def __init__(self) -> None:
         self.decorations_repository: DecorationRepository = DecorationRepository()
@@ -25,19 +25,19 @@ class Controller:
         raise Exception(f"No aquarium {aquarium_name} in {self.aquariums}!*")
 
     def add_aquarium(self, aquarium_type: str, aquarium_name: str) -> str:
-        if aquarium_type not in type(self).VALID_AQUARIUMS:
+        if aquarium_type not in self._VALID_AQUARIUMS:
             return "Invalid aquarium type."
 
-        aquarium = type(self).VALID_AQUARIUMS[aquarium_type](aquarium_name)
+        aquarium = self._VALID_AQUARIUMS[aquarium_type](aquarium_name)
         self.aquariums.append(aquarium)
 
         return f"Successfully added {aquarium_type}."
 
     def add_decoration(self, decoration_type: str) -> str:
-        if decoration_type not in Controller.VALID_DECORATIONS:
+        if decoration_type not in Controller._VALID_DECORATIONS:
             return "Invalid decoration type."
 
-        decoration = Controller.VALID_DECORATIONS[decoration_type]()
+        decoration = Controller._VALID_DECORATIONS[decoration_type]()
         self.decorations_repository.add(decoration)
         return f"Successfully added {decoration_type}."
 
@@ -52,7 +52,7 @@ class Controller:
         return f"Successfully added {decoration_type} to {aquarium_name}."
 
     def add_fish(self, aquarium_name: str, fish_type: str, fish_name: str, fish_species: str, price: float) -> str:
-        if fish_type not in type(self).VALID_FISH:
+        if fish_type not in self._VALID_FISH:
             return f"There isn't a fish of type {fish_type}."
 
         aquarium = self._get_aquarium(aquarium_name)
@@ -62,7 +62,7 @@ class Controller:
         if fish_type not in aquarium.FISH_TYPES:
             return "Water not suitable."
 
-        fish = type(self).VALID_FISH[fish_type](fish_name, fish_species, price)
+        fish = self._VALID_FISH[fish_type](fish_name, fish_species, price)
         aquarium.add_fish(fish)
         return f"Successfully added {fish_type} to {aquarium_name}."
 
